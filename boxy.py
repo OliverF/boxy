@@ -59,13 +59,17 @@ except getopt.Getopterror:
 	print help
 	sys.exit(2)
 
-for option, arg in options:
-	if (option == "-i"):
-		inputport = int(arg)
-	elif (option == "-p"):
-		remoteport = int(arg)
-	elif (option == "-a"):
-		remoteaddress = arg
+try:
+	for option, arg in options:
+		if (option == "-i"):
+			inputport = int(arg)
+		elif (option == "-p"):
+			remoteport = int(arg)
+		elif (option == "-a"):
+			remoteaddress = arg
+except ValueError:
+	print help
+	sys.exit(2)
 
 if ((0 < inputport <= 65535 and 0 < remoteport <= 65535 and remoteaddress != "") == False):
 	print help
