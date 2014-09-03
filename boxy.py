@@ -11,9 +11,15 @@ remoteport = 0
 remoteaddress = ""
 kill = False
 
+bytestoremote = 0
+bytesfromremote = 0
+
 help = "Invalid arguments, usage:\nboxy.py -i <input port> -p <remote port> -a <remote address>"
 
 def relay():
+	global bytestoremote
+	global bytesfromremote
+
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 	sock.bind(("0.0.0.0", inputport))
 
@@ -36,9 +42,38 @@ def relay():
 		if (fromaddr[0] == clientip):
 			#forward from client to server
 			sock.sendto(data, (remoteaddress, remoteport))
+			bytestoremote += sys.getsizeof(data)
 		else:
 			#forward from server to client
 			sock.sendto(data, (clientip, clientport))
+			bytesfromremote += sys.getsizeof(data)
+
+def reportbandwidth():
+	global bytestoremote
+	global bytesfromremote
+	step = 0
+	while True:
+		time.sleep(1)
+		if (sys.platform == "win32"):
+			os.system('cls')
+		else:
+			os.system('clear')
+		print "Relaying on port {0} to {1}:{2}".format(inputport, remoteaddress, remoteport)
+		print "From remote: {0:.2f}MB/s | To remote: {1:.2f}MB/s".format(float(bytesfromremote)/1000000, float(bytestoremote)/1000000)
+		if (step == 0):
+			print "\\"
+			step += 1
+		elif (step == 1):
+			print "|"
+			step += 1
+		elif (step == 2):
+			print "/"
+			step += 1
+		elif (step == 3):
+			print "-"
+			step = 0
+		bytesfromremote = 0
+		bytestoremote = 0
 
 def quit():
 	global kill
@@ -80,6 +115,10 @@ print "Relay starting on port " + str(inputport) + ", relaying UDP to", remotead
 #start relay
 relaythread = threading.Thread(target=relay)
 relaythread.start()
+
+reportbandwidththread = threading.Thread(target = reportbandwidth)
+reportbandwidththread.daemon = True
+reportbandwidththread.start()
 
 try:
 	while raw_input() != "quit":
