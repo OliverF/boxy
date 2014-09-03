@@ -21,3 +21,5 @@ Simple two-way UDP packet relay.
 2. Connect to the relay at 192.0.2.0:4321
 
 3. Done! You can send data to the relay and it will be relayed to the remote server, and you will receive the data returned from the remote server back from the relay itself
+
+![boxy usage example screenshot](https://dl.dropboxusercontent.com/u/10518681/boxy_usage.png)
